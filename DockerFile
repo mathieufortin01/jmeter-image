@@ -1,0 +1,19 @@
+FROM amazoncorretto:8u232
+
+ENV JMETER_VERSION 5.2.1
+ENV JMETER_DOWNLOAD_URL https://archive.apache.org/dist/jmeter/binaries
+
+RUN yum install -y tar && \
+  yum -y install gzip
+
+RUN cd /var/lib && \
+  curl $JMETER_DOWNLOAD_URL/apache-jmeter-$JMETER_VERSION.tgz -o /var/lib/jmeter.tgz && \
+  tar xzf jmeter.tgz && \
+  mv apache-jmeter* apache-jmeter && \
+  rm -rf jmeter.tgz
+
+ENV SERVER_PORT 8000
+ENV SERVER_RMI_LOCAL_PORT 8001
+ENV HOSTNAME ""
+
+ENTRYPOINT [ "sh", "-c", "/var/lib/apache-jmeter/bin/jmeter-server -Djava.rmi.server.hostname=$HOSTNAME -Jserver.rmi.ssl.disable=true -Jserver.rmi.port=$SERVER_PORT -Jserver.rmi.localport=$SERVER_RMI_LOCAL_PORT" ]
